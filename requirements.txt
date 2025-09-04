@@ -6,6 +6,6 @@ opencv-python
 imagehash
 numpy
 streamlit
-pysse
+pytesseract
 
 

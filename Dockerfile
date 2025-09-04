@@ -3,6 +3,7 @@ FROM python:3.11-slim
 # Cài libGL để OpenCV hoạt động
 RUN apt-get update && apt-get install -y libgl1
 
+
 # Tạo thư mục app
 WORKDIR /app
 

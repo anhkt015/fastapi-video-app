@@ -1,6 +1,5 @@
-FROM python:3.11-slim
+FROM python:3.11
 
-# Cài thư viện hệ thống cho OpenCV
 RUN apt-get update && apt-get install -y libgl1 libglib2.0-0
 
 WORKDIR /app

@@ -1,6 +1,5 @@
 FROM python:3.11-slim
 
-# Cài thư viện hệ thống cho OpenCV + Tesseract
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
@@ -8,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxext6 \
     tesseract-ocr \
+    tesseract-ocr-vie \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

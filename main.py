@@ -56,6 +56,9 @@ def custom_openapi():
 
 # Kích hoạt Swagger bảo mật
 app.openapi = custom_openapi
+from routers import auth
+app.include_router(auth.router)
+
 
 # Chạy app nếu gọi trực tiếp
 if __name__ == "__main__":

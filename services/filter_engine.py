@@ -40,6 +40,10 @@ def filter_unique_images(image_paths, hash_threshold=8, text_similarity=0.9):
         if not is_hash_duplicate and not is_text_duplicate:
             hashes.append((phash, dhash))
             texts.append(norm_text)
-            unique.append((path, raw_text))
+            # ✅ Trả về dict thay vì tuple để dễ xử lý
+            unique.append({
+                "path": path,
+                "text": raw_text
+            })
 
     return unique

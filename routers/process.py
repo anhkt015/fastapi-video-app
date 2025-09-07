@@ -46,3 +46,9 @@ async def process_video(file: UploadFile):
     except Exception as e:
         logger.error(f"[ERROR] Failed to process video: {e}")
         return {"error": str(e)}
+from auth.jwt_handler import verify_token
+from fastapi import Depends
+
+@router.post("/process_video", dependencies=[Depends(verify_token)])
+async def process_video(file: UploadFile):
+    ...

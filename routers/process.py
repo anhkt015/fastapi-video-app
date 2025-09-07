@@ -1,8 +1,7 @@
-from fastapi import APIRouter, UploadFile, Depends
+from fastapi import APIRouter, UploadFile, Request
 from services.video_processor import extract_frames
 from services.filter_engine import filter_unique_images
 from services.cloud import upload_to_supabase
-from auth.jwt_handler import verify_token
 import os
 import logging
 
@@ -10,9 +9,13 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-@router.post("/process_video", dependencies=[Depends(verify_token)])
-async def process_video(file: UploadFile):
+@router.post("/process_video")
+async def process_video(file: UploadFile, request: Request):
     try:
+        # ✅ Lấy token từ header
+        token = request.headers.get("Authorization")
+        logger.info(f"[AUTH] Token received: {token}")
+
         # Tạo thư mục lưu video
         upload_dir = "static/uploads"
         os.makedirs(upload_dir, exist_ok=True)

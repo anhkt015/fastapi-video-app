@@ -36,8 +36,6 @@ from fastapi.security import HTTPBearer
 from fastapi.openapi.models import APIKey, APIKeyIn, SecuritySchemeType
 from fastapi.openapi.utils import get_openapi
 
-app = FastAPI()
-
 security = HTTPBearer()
 
 def custom_openapi():

@@ -2,10 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBearer
+from fastapi.openapi.utils import get_openapi
 from routers import process
 import os
 import uvicorn
 
+# Khởi tạo app
 app = FastAPI()
 
 # Mount thư mục static để phục vụ ảnh/video nếu cần
@@ -27,15 +30,7 @@ def upload_page(request: Request):
 def home():
     return {"status": "App is running"}
 
-# Chạy app nếu gọi trực tiếp
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
-from fastapi import FastAPI
-from fastapi.security import HTTPBearer
-from fastapi.openapi.models import APIKey, APIKeyIn, SecuritySchemeType
-from fastapi.openapi.utils import get_openapi
-
+# Cấu hình Swagger để hiển thị nút Authorize
 security = HTTPBearer()
 
 def custom_openapi():
@@ -59,5 +54,10 @@ def custom_openapi():
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
-#app.openapi = custom_openapi
+# Kích hoạt Swagger bảo mật
+app.openapi = custom_openapi
 
+# Chạy app nếu gọi trực tiếp
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)

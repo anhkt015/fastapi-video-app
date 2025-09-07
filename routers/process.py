@@ -1,7 +1,8 @@
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, Depends
 from services.video_processor import extract_frames
 from services.filter_engine import filter_unique_images
 from services.cloud import upload_to_supabase
+from auth.jwt_handler import verify_token
 import os
 import logging
 
@@ -9,7 +10,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-@router.post("/process_video")
+@router.post("/process_video", dependencies=[Depends(verify_token)])
 async def process_video(file: UploadFile):
     try:
         # Tạo thư mục lưu video
@@ -31,8 +32,8 @@ async def process_video(file: UploadFile):
         logger.info(f"[FILTER] Found {len(unique_images)} unique images")
 
         # Upload ảnh lên Supabase
-        for i, img_path in enumerate(unique_images):
-            with open(img_path, "rb") as f:
+        for i, img in enumerate(unique_images):
+            with open(img["path"], "rb") as f:
                 upload_to_supabase(
                     bucket="processed",
                     path=f"frames/{file.filename}/frame_{i}.jpg",
@@ -46,9 +47,4 @@ async def process_video(file: UploadFile):
     except Exception as e:
         logger.error(f"[ERROR] Failed to process video: {e}")
         return {"error": str(e)}
-from auth.jwt_handler import verify_token
-from fastapi import Depends
 
-@router.post("/process_video", dependencies=[Depends(verify_token)])
-async def process_video(file: UploadFile):
-    ...

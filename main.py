@@ -61,9 +61,6 @@ app.include_router(auth.router)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-app = FastAPI()
-
 # Cho phép frontend gọi API từ localhost
 app.add_middleware(
     CORSMiddleware,

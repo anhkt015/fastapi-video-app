@@ -59,6 +59,19 @@ app.openapi = custom_openapi
 from routers import auth
 app.include_router(auth.router)
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# Cho phép frontend gọi API từ localhost
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # hoặc ["*"] nếu bạn muốn mở rộng
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Chạy app nếu gọi trực tiếp
 if __name__ == "__main__":

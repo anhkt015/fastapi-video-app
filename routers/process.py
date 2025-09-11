@@ -4,6 +4,7 @@ from services.filter_engine import filter_unique_images
 from services.cloud import upload_to_supabase
 import os
 import logging
+import uuid
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -34,20 +35,32 @@ async def process_video(file: UploadFile, request: Request):
         unique_images = filter_unique_images(frame_paths)
         logger.info(f"[FILTER] Found {len(unique_images)} unique images")
 
-        # Upload ảnh lên Supabase
-        for i, img in enumerate(unique_images):
-            with open(img["path"], "rb") as f:
-                upload_to_supabase(
-                    bucket="processed",
-                    path=f"frames/{file.filename}/frame_{i}.jpg",
-                    data=f.read(),
-                    mime="image/jpeg"
-                )
-        logger.info(f"[UPLOAD] Uploaded {len(unique_images)} images to Supabase")
+        # ✅ Tạo thư mục duy nhất để tránh trùng tên
+        folder_id = str(uuid.uuid4())
 
-        return {"results": unique_images}
+        uploaded_results = []
+        for i, img in enumerate(unique_images):
+            try:
+                with open(img["path"], "rb") as f:
+                    upload_to_supabase(
+                        bucket="processed",
+                        path=f"frames/{folder_id}/frame_{i}.jpg",
+                        data=f.read(),
+                        mime="image/jpeg"
+                    )
+                # ✅ Lưu lại đường dẫn ảnh để trả về cho frontend
+                uploaded_results.append({
+                    "image_url": f"https://mlilkuppuscoazyajnnc.supabase.co/storage/v1/object/public/processed/frames/{folder_id}/frame_{i}.jpg",
+                    "text": img["text"]
+                })
+            except Exception as upload_error:
+                logger.warning(f"[SKIP] Lỗi upload frame {i}: {upload_error}")
+                continue
+
+        logger.info(f"[UPLOAD] Uploaded {len(uploaded_results)} images to Supabase")
+
+        return {"frames": uploaded_results}
 
     except Exception as e:
         logger.error(f"[ERROR] Failed to process video: {e}")
         return {"error": str(e)}
-

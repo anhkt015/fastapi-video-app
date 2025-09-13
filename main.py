@@ -4,7 +4,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPBearer
 from fastapi.openapi.utils import get_openapi
-from routers import process
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from routers import process, auth
 import os
 import uvicorn
 
@@ -14,8 +16,9 @@ app = FastAPI()
 # Mount thư mục static để phục vụ ảnh/video nếu cần
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Kết nối router xử lý video
+# Kết nối router xử lý video và đăng nhập
 app.include_router(process.router)
+app.include_router(auth.router)
 
 # Cấu hình thư mục chứa HTML
 templates = Jinja2Templates(directory="templates")
@@ -29,6 +32,16 @@ def upload_page(request: Request):
 @app.get("/")
 def home():
     return {"status": "App is running"}
+
+# Endpoint mới: xử lý ảnh gửi từ frontend
+class AnalyzeRequest(BaseModel):
+    image_url: str
+    question: str
+
+@app.post("/analyze")
+def analyze_image(req: AnalyzeRequest):
+    # Gọi mô hình AI tại đây (hoặc trả về giả lập để test)
+    return {"answer": f"Phân tích ảnh: {req.image_url.split('/')[-1]}"}
 
 # Cấu hình Swagger để hiển thị nút Authorize
 security = HTTPBearer()
@@ -56,11 +69,7 @@ def custom_openapi():
 
 # Kích hoạt Swagger bảo mật
 app.openapi = custom_openapi
-from routers import auth
-app.include_router(auth.router)
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 # Cho phép frontend gọi API từ localhost
 app.add_middleware(
     CORSMiddleware,

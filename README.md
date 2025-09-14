@@ -45,14 +45,44 @@ Một ứng dụng web sử dụng AI để phân tích nội dung từ video ho
   Dù không phải UI chính, Streamlit giúp mình test nhanh mô hình AI và hiển thị kết quả trực quan trước khi tích hợp vào frontend React.
 
 ---
+## ⏳ Thời gian thực hiện
+
+- **Bắt đầu:** 1 Tháng 9 năm 2025  
+- **Kết thúc bản MVP:** 14  Tháng 9 năm 2025  
+- **Tổng thời gian:** ~2 tuần (làm ngoài giờ học + cuối tuần)
+
+---
+
+## 🧗 Những khó khăn & cách vượt qua
+
+- **Xử lý video và trích frame:**  
+  Ban đầu mình dùng OpenCV để trích frame, nhưng gặp vấn đề với hiệu suất và ảnh trùng lặp. Sau đó mình tích hợp `imagehash` để lọc ảnh gần giống, giúp giảm số lượng ảnh cần xử lý , nhưng chưa đủ vẫn khá nhiều ảnh tuy bố cục không giống nhưng giống về nội dung nên mình tiếp tục tích hợp thêm 'Pytesseract' , nhưng việc tải Terract và tải bản tiếng việt tích hợp vô app khá khó khăn vì liên quan nhiều đến hệ thống .
+
+- **Tích hợp Supabase:**  
+  Việc lưu video và metadata lên Supabase khá mới với mình. Mình phải học cách dùng bucket, tạo bảng `video_jobs`, và viết truy vấn SQL để lọc kết quả.
+
+- **Gọi mô hình AI từ Hugging Face:**  
+  Gặp lỗi xác thực API và giới hạn tốc độ. Mình đã viết hàm retry và xử lý lỗi để đảm bảo hệ thống không bị crash khi gọi model.
+
+- **Triển khai backend lên Railway:**  
+  Railway không hỗ trợ lưu file tạm nên mình phải cấu hình lại đường dẫn lưu ảnh và dùng Supabase làm storage chính, việc deloy liên tục bị lỗi , đây là phần chiếm nhiều thòi gian và khó khăn để sửa nhất , liên tục phải tạo file mới , cách mới để deloy thành công , phần backend ban đầu cũng bị lỗi vì thư viện Pytesseract, khá khó khăn để debug 
+
+- **JWT và bảo mật API:**  
+  Việc tạo và kiểm tra token bằng `python-jose` khá phức tạp lúc đầu. Sau khi đọc tài liệu và test kỹ, mình đã viết module `jwt_handler.py` để tái sử dụng dễ dàng.
+
+- **Giao diện thử nghiệm bằng Streamlit:**  
+  Dù không phải UI chính, Streamlit giúp mình test nhanh mô hình AI và hiển thị kết quả trực quan trước khi tích hợp vào frontend React.
+- **frontend tạo giao diện , phát triển phần mềm , chính thức tạo web **
+  Phần này tuy không nhiều lỗi nữa nhưng vẫn có rất nhiều vấn đề như mô hình Ai copilot hay chatgpt không có API công khai nên không thể tích hợp vào web, việc phải tìm mô hình Ai phù hợp còn sài được cũng không dễ dàng , 
+---
 
 ## 💡 Bài học rút ra
 
 - Biết cách chia nhỏ hệ thống thành các phần độc lập: frontend, backend, AI, storage
 - Hiểu rõ luồng xử lý video và ảnh trong môi trường thực tế
-- Làm quen với Supabase, Railway, Hugging Face API, và Streamlit
+- Làm quen với Supabase, Railway, Hugging Face API, và Streamlit 
 - Viết README và tài liệu kỹ thuật rõ ràng để người khác dễ hiểu và đóng góp
----
+
 
 ## 🧠 Lessons Learned
 

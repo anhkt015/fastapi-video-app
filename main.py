@@ -47,7 +47,7 @@ def analyze_image(req: AnalyzeRequest):
 
     try:
         res = requests.post(
-            "https://hf.space/embed/MrOvkill/moondream-2-multi-interrogation/api/predict",
+            "https://hf.space/embed/sergiopaniego/vlm_object_understanding/api/predict",
             json=payload
         )
 

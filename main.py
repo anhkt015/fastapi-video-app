@@ -47,26 +47,18 @@ def analyze_image(req: AnalyzeRequest):
 
     try:
         res = requests.post(
-            "https://hf.space/embed/prithivMLmods/Tiny-VLMs-Lab/api/predict",
+            "https://hf.space/embed/MrOvkill/moondream-2-multi-interrogation/api/predict",
             json=payload
         )
 
-        # Kiểm tra phản hồi HTTP
         if res.status_code != 200:
             return {"answer": f"Lỗi HTTP {res.status_code}: {res.text}"}
 
-        # Kiểm tra phản hồi JSON
-        try:
-            result = res.json()
-            answer = result["data"][0] if "data" in result else "Không có kết quả"
-        except Exception as json_err:
-            return {
-                "answer": f"Lỗi JSON: {str(json_err)}",
-                "raw_response": res.text
-            }
+        result = res.json()
+        answer = result["data"][0] if "data" in result else "Không có kết quả"
 
     except Exception as e:
-        return {"answer": f"Lỗi khi gọi mô hình: {str(e)}"}
+        answer = f"Lỗi khi gọi mô hình: {str(e)}"
 
     return {"answer": answer}
 

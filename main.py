@@ -50,10 +50,23 @@ def analyze_image(req: AnalyzeRequest):
             "https://hf.space/embed/prithivMLmods/Tiny-VLMs-Lab/api/predict",
             json=payload
         )
-        result = res.json()
-        answer = result["data"][0] if "data" in result else "Không có kết quả"
+
+        # Kiểm tra phản hồi HTTP
+        if res.status_code != 200:
+            return {"answer": f"Lỗi HTTP {res.status_code}: {res.text}"}
+
+        # Kiểm tra phản hồi JSON
+        try:
+            result = res.json()
+            answer = result["data"][0] if "data" in result else "Không có kết quả"
+        except Exception as json_err:
+            return {
+                "answer": f"Lỗi JSON: {str(json_err)}",
+                "raw_response": res.text
+            }
+
     except Exception as e:
-        answer = f"Lỗi khi gọi mô hình: {str(e)}"
+        return {"answer": f"Lỗi khi gọi mô hình: {str(e)}"}
 
     return {"answer": answer}
 
@@ -96,4 +109,5 @@ app.add_middleware(
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     uvicorn.run("main:app", host="0.0.0.0", port=port)
+
 

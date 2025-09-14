@@ -7,6 +7,7 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from routers import process, auth
+import requests
 import os
 import uvicorn
 
@@ -33,15 +34,28 @@ def upload_page(request: Request):
 def home():
     return {"status": "App is running"}
 
-# Endpoint mới: xử lý ảnh gửi từ frontend
+# Endpoint mới: xử lý ảnh gửi từ frontend → gọi Tiny VLMs Lab
 class AnalyzeRequest(BaseModel):
     image_url: str
     question: str
 
 @app.post("/analyze")
 def analyze_image(req: AnalyzeRequest):
-    # Gọi mô hình AI tại đây (hoặc trả về giả lập để test)
-    return {"answer": f"Phân tích ảnh: {req.image_url.split('/')[-1]}"}
+    payload = {
+        "data": [req.image_url, req.question]
+    }
+
+    try:
+        res = requests.post(
+            "https://hf.space/embed/prithivMLmods/Tiny-VLMs-Lab/api/predict",
+            json=payload
+        )
+        result = res.json()
+        answer = result["data"][0] if "data" in result else "Không có kết quả"
+    except Exception as e:
+        answer = f"Lỗi khi gọi mô hình: {str(e)}"
+
+    return {"answer": answer}
 
 # Cấu hình Swagger để hiển thị nút Authorize
 security = HTTPBearer()
@@ -67,7 +81,6 @@ def custom_openapi():
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
-# Kích hoạt Swagger bảo mật
 app.openapi = custom_openapi
 
 # Cho phép frontend gọi API từ localhost
@@ -83,3 +96,4 @@ app.add_middleware(
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     uvicorn.run("main:app", host="0.0.0.0", port=port)
+
